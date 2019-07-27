@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 - test12*-
 import scrapy
 
 
-class BooksSpider(scrapy.Spider):
+class ConfonetCauseList(scrapy.Spider):
     name = "confonetCauselist"       
     allowed_domains = ["http://cms.nic.in"]
     start_urls = [
@@ -27,7 +27,7 @@ class BooksSpider(scrapy.Spider):
                             "X-Requested-With": "XMLHttpRequest"}
     def start_request(self):
         for url in start_urls: 
-            yield scrapy.FormRequest(url=url, formdata=requestFormDataDict, method='POST', headers = requestFormHeaderDcit, encoding='utf-8', priority=0)
+            yield scrapy.FormRequest(url=url, formdata=requestFormDataDict, callback = self.parse, method='POST', headers = requestFormHeaderDcit, encoding='utf-8', priority=0)
             
     def parse(self, response):
         for book_url in response.css("article.product_pod > h3 > a ::attr(href)").extract():
@@ -36,15 +36,4 @@ class BooksSpider(scrapy.Spider):
         if next_page:
             yield scrapy.Request(response.urljoin(next_page), callback=self.parse)
 
-    def parse_book_page(self, response):
-        item = {}
-        product = response.css("div.product_main")
-        item["title"] = product.css("h1 ::text").extract_first()
-        item['category'] = response.xpath(
-            "//ul[@class='breadcrumb']/li[@class='active']/preceding-sibling::li[1]/a/text()"
-        ).extract_first()
-        item['description'] = response.xpath(
-            "//div[@id='product_description']/following-sibling::p/text()"
-        ).extract_first()
-        item['price'] = response.css('p.price_color ::text').extract_first()
-        yield item
+
