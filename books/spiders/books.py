@@ -1,15 +1,16 @@
-# -*- coding: utf-8 - test12*-
+# -*- coding: utf-8 -1 *-
 import scrapy
-
+import mysql.connector 
 
 class ConfonetCauseList(scrapy.Spider):
-    name = "confonetCauselist"       
+    name = "confonetCauselistNCDRC"       
     allowed_domains = ["http://cms.nic.in"]
     start_urls = [
         'http://cms.nic.in/ncdrcusersWeb/causelist.do?method=loadCauseListViewPub',
     ]
     requestFormDataDict = {"method": "GetHtmlCL",
-                        "method": "GetHtml",
+                        "method":
+                         "GetHtml",
                         "stid": 0,
                         "did": 0,
                         "stdate": "26/07/2019",
@@ -30,10 +31,6 @@ class ConfonetCauseList(scrapy.Spider):
             yield scrapy.FormRequest(url=url, formdata=requestFormDataDict, callback = self.parse, method='POST', headers = requestFormHeaderDcit, encoding='utf-8', priority=0)
             
     def parse(self, response):
-        for book_url in response.css("article.product_pod > h3 > a ::attr(href)").extract():
-            yield scrapy.Request(response.urljoin(book_url), callback=self.parse_book_page)
-        next_page = response.css("li.next > a ::attr(href)").extract_first()
-        if next_page:
-            yield scrapy.Request(response.urljoin(next_page), callback=self.parse)
+        
 
 
